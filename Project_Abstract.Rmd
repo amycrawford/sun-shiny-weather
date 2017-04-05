@@ -1,6 +1,6 @@
 ---
 title: "Interactive Weather Chart"
-author: "Katie Will, Kiegan Rice"
+author: "Katie Will, Kiegan Rice, Amy Crawford"
 date: "4/4/2017"
 output: pdf_document
 ---
