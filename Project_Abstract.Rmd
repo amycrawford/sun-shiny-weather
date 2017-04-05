@@ -1,0 +1,10 @@
+---
+title: "Interactive Weather Chart"
+author: "Katie Will, Kiegan Rice"
+date: "4/4/2017"
+output: pdf_document
+---
+
+### Abstract
+
+In 2016, the New York Times published an interactive chart displaying 2015 temperature data for 3,116 U.S. cities. We plan on scraping historical data from *Weather Underground* for multiple cities for the years of 1945-2017. With this data, we plan on recreating the interactive chart published by the New York Times using a Shiney applet. Our chart, however, will have an extra feature that takes into accout the year. With our visual, we will display the daily temperature averages as well as the record highs and lows. 
