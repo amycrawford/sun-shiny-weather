@@ -1,5 +1,5 @@
 ---
-title: "A Shiny App Recreation of the New York Times Weather Chart"
+title: "A (sun)Shiny Recreation of the New York Times Weather Chart"
 author: "Katie Will, Kiegan Rice, Amy Crawford"
 output: pdf_document
 ---
