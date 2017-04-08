@@ -1,0 +1,217 @@
+---
+title: 'Sun Shiny Weather: Web Scraping'
+output: html_document
+---
+
+Reading in required packages:
+```{r, include = F, warning = F, message = F}
+library(tidyverse)
+library(rvest)
+library(lubridate)
+```
+
+Currently only for Des Moines airport, which starts 1945-01-01 with both 'actual' and 'average' temps.
+Some airports don't have 'actual' temps until a later date. 
+
+Extracting temps for each days and record temps in one loop. (this is redundant) This will also take a couple hours to run. 
+```{r, include = F, warning = F, message = F}
+Date <- ymd("1945-01-01")  # set a starting date
+day_temps <- list()        # empty list for min, max, and mean temps, actual and historical averages
+record_temps <- list()     # empty list for record temps
+                           # one item in the list for each day
+i <- 1                     # counter for the list item
+
+# Need to create the url which changes for each day (and each airport)
+url_begin <- "https://www.wunderground.com/history/airport/" 
+airport <- "KDSM/"                  # This will change in loop (eventually)
+url_end <- "/DailyHistory.html"
+
+  while(Date < Sys.Date()){
+    date <- gsub("-", "/", Date)      
+    url <- paste(url_begin, airport, date, url_end, sep = "") # Pasting together parts of url
+    html <- read_html(url)
+    
+    # grabbing the "Actual" daily temperatures (mean, min, and max)
+    actual_vals <- html %>% 
+      html_nodes("#historyTable tr:nth-child(4) td:nth-child(2) , #historyTable tr:nth-child(3) td:nth-child(2), #historyTable tr:nth-child(2) td:nth-child(2)") %>% html_text %>% 
+      gsub("-", "NA", .) %>% gsub("°F", "", .) %>% gsub("\n", "", .) %>% gsub("[[:blank:]]", "", .)
+    
+    # grabbing the historical "Average" temperatures (mean, min, and max)
+    average_vals <- html %>% 
+      html_nodes("#historyTable tr:nth-child(4) td:nth-child(3) , #historyTable tr:nth-child(3) :nth-child(3), #historyTable tr:nth-child(2) td:nth-child(3)") %>% html_text %>% 
+      gsub("-", "NA", .) %>% gsub("°F", "", .) %>% gsub("\n", "", .) %>% gsub("[[:blank:]]", "", .)
+    
+    # grabbing the labels for the temperature values
+    temp <- html %>% 
+      html_nodes("tr:nth-child(4) .indent , tr:nth-child(3) .indent, tr:nth-child(2) .indent") %>% 
+      html_text()
+    
+    # grabbing the record min and max for each day
+    # this is redundant and may need to be fixed for efficiency purposes
+    record <- html %>% 
+      html_nodes("#historyTable tr:nth-child(4) td:nth-child(4) , #historyTable tr:nth-child(3) td:nth-child(4)") %>%
+      html_text()
+    record_vals <- parse_number(record)
+    record_yrs <- record %>% gsub("^[^\\(]+", "", .) %>% parse_number(.)
+    
+    # putting data into a data frame which then makes up one item in the master list
+    # two different lists (one for daily temps and one for the record temps)
+    day_temps[[i]] <- data.frame(day = Date,
+                          mean_max_min = rep(temp, times = 2),
+                          actual_ave = rep(c("Actual", "Historical Average"), each = 3),
+                          value = as.numeric(c(actual_vals, average_vals)))
+    
+    record_temps[[i]] <- data.frame(day = "08-11",
+                               year = record_yrs,
+                               record_type = c("Max", "Min"),
+                               value = record_vals)
+    
+    Date <- Date+1
+    i <- i+1
+  }
+
+# binding together all items of the list
+DSM_temps <- dplyr::bind_rows(day_temps)
+DSM_records <- dplyr::bind_rows(record_temps)
+```
+
+To fix the redundancy, split the loop into two. 
+
+This loop extracts the record temps (so a min and max for 366 days)
+```{r}
+# Two while loops to fix the redundant records
+
+# loop to grab record min and max from the web (note this is only for 366 days)
+Date <- ymd("2016-01-01")
+record_temps <- list() 
+i <- 1
+
+# Need to create the url which changes for each day (and each airport)
+url_begin <- "https://www.wunderground.com/history/airport/" 
+airport <- "KDSM/"                  # This will change in loop (eventually)
+url_end <- "/DailyHistory.html"
+
+  while(Date < ymd("2017-01-01")){
+    date <- gsub("-", "/", Date)      
+    url <- paste(url_begin, airport, date, url_end, sep = "") # Pasting together parts of url
+    html <- read_html(url)
+    
+    # grabbing the record min and max for each day
+    # this is redundant and may need to be fixed for efficiency purposes
+    record <- html %>% 
+      html_nodes("#historyTable tr:nth-child(4) td:nth-child(4) , #historyTable tr:nth-child(3) td:nth-child(4)") %>%
+      html_text()
+    record_vals <- parse_number(record)
+    record_yrs <- record %>% gsub("^[^\\(]+", "", .) %>% parse_number(.)
+    
+    record_temps[[i]] <- data.frame(month_number = month(Date, label = F),
+                                    month_name = month(Date, label = T),
+                                    day = day(Date),
+                                    record_year = record_yrs,
+                                    record_type = c("Max", "Min"),
+                                    value = record_vals)
+    
+    Date <- Date+1
+    i <- i+1
+  }
+
+DSM_records <- dplyr::bind_rows(record_temps)
+
+```
+
+Plots of record temps
+```{r}
+DSM_records <- DSM_records %>% mutate(day_of_year = 1:nrow(DSM_records), date = as.Date(paste(month_name, day, sep = "-"), format = "%b-%d"))
+
+plot1 <-  DSM_records %>% ggplot(aes(y = value, x = day_of_year, colour = record_type)) +
+                            geom_point(aes(text = record_year))
+plotly::ggplotly(plot1)
+                            
+
+plot1 <-  DSM_records %>% ggplot(aes(y = value, x = month_number, colour = record_type)) + 
+                            geom_point(aes(text = record_year)) +
+                            scale_x_discrete(name = "Month", 
+                                             breaks = data$month_number,
+                                             labels = data$month_name
+                                             )
+
+
+```
+
+This loop extracts the temps for each day (so a min, max, mean for 'actual' and 'average' for approx. 26,280 days)
+```{r}
+# loop to grab daily temps from the web (note this is approximately 26,000 days for DSM)
+Date <- ymd("1945-01-01")  # set a starting date
+day_temps <- list()        # empty list for min, max, and mean temps, actual and historical averages
+i <- 1                     # counter for the list item
+
+# Need to create the url which changes for each day (and each airport)
+url_begin <- "https://www.wunderground.com/history/airport/" 
+airport <- "KDSM/"                  # This will change in loop (eventually)
+url_end <- "/DailyHistory.html"
+
+  while(Date < Sys.Date()){
+    date <- gsub("-", "/", Date)      
+    url <- paste(url_begin, airport, date, url_end, sep = "") # Pasting together parts of url
+    html <- read_html(url)
+    
+    # grabbing the "Actual" daily temperatures (mean, min, and max)
+    actual_vals <- html %>% 
+      html_nodes("#historyTable tr:nth-child(4) td:nth-child(2) , #historyTable tr:nth-child(3) td:nth-child(2), #historyTable tr:nth-child(2) td:nth-child(2)") %>% html_text %>% 
+      gsub("-", "NA", .) %>% gsub("°F", "", .) %>% gsub("\n", "", .) %>% gsub("[[:blank:]]", "", .)
+    
+    # grabbing the historical "Average" temperatures (mean, min, and max)
+    average_vals <- html %>% 
+      html_nodes("#historyTable tr:nth-child(4) td:nth-child(3) , #historyTable tr:nth-child(3) :nth-child(3), #historyTable tr:nth-child(2) td:nth-child(3)") %>% html_text %>% 
+      gsub("-", "NA", .) %>% gsub("°F", "", .) %>% gsub("\n", "", .) %>% gsub("[[:blank:]]", "", .)
+    
+    # grabbing the labels for the temperature values
+    temp <- html %>% 
+      html_nodes("tr:nth-child(4) .indent , tr:nth-child(3) .indent, tr:nth-child(2) .indent") %>% 
+      html_text()
+    
+    # putting data into a data frame which then makes up one item in the master list
+    # two different lists (one for daily temps and one for the record temps)
+    day_temps[[i]] <- data.frame(year = year(Date), 
+                                 month = month(Date, label = T),
+                                 day = day(Date),
+                                 mean_max_min = rep(temp, times = 2),
+                                 actual_ave = rep(c("Actual", "Historical Average"), each = 3),
+                                 value = as.numeric(c(actual_vals, average_vals)))
+    
+    Date <- Date+1
+    i <- i+1
+  }
+
+DSM_temps <- dplyr::bind_rows(day_temps)
+
+```
+
+
+*Attempt to optimize:* 
+```{r}
+library(reshape)
+# Attempt at better efficiency... using html_table
+
+
+Date <- ymd("1945-01-01") 
+
+# URL code stays the same
+    url_begin <- "https://www.wunderground.com/history/airport/" 
+    airport <- "KDSM/"                  # This will change in loop (eventually)
+    date <- gsub("-", "/", Date)      
+    url_end <- "/DailyHistory.html"
+    url <- paste(url_begin, airport, date, url_end, sep = "") # Pasting together parts of url
+    html <- read_html(url)
+    tables <- html %>% html_table(fill = TRUE)
+
+    sm_table <- tables[[1]][2:4,1:3]
+    sm_table <- setNames(sm_table, c("Temperature", "Actual", "Average"))
+    rec_table <- tables[[1]][3:4, c(1,4)] 
+    rec_table <- rec_table %>% setNames(., c("Temperature", "Record")) %>%
+                      transform(., Record = colsplit(Record, split = "\\\n", names = c('temp', 'year')))
+    sm_table
+    rec_table
+
+```
+
