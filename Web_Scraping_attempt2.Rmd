@@ -1,0 +1,91 @@
+---
+title: 'Web Scraping: attempt 2'
+author: "Katie Will"
+date: "April 8, 2017"
+output: html_document
+---
+
+*html_session within function *
+
+4/8/17  1:44pm    SYSTEM.TIME:  336.107 seconds elapsed
+
+```{r}
+#url_begin <- "https://www.wunderground.com/history/airport/KDSM/" 
+link_dates <- gsub(pattern = "-", replacement = "/", x = seq(from = as.Date("1945-01-01"), to = Sys.Date(), by = "days"))
+links <- paste0(link_dates, "/DailyHistory.html?req_city=&req_state=&req_statename=&reqdb.zip=&reqdb.magic=&reqdb.wmo=")
+
+#date <- "2017/04/08"
+#links <- paste0(date, "/DailyHistory.html?req_city=&req_state=&req_statename=&reqdb.zip=&reqdb.magic=&reqdb.wmo=")
+
+#s <- html_session("https://www.wunderground.com/history/airport/")
+#html_form(s)
+
+
+grab_temps <- function(link){
+  s <- html_session("https://www.wunderground.com/history/airport/")
+  ss <- s %>% jump_to(paste0("KDSM/",link))
+  html <- read_html(ss)
+  
+  actual_vals <- html %>% 
+      html_nodes("#historyTable tr:nth-child(4) td:nth-child(2) , #historyTable tr:nth-child(3) td:nth-child(2), #historyTable tr:nth-child(2) td:nth-child(2)") %>% html_text() %>% gsub("\n", "", .) %>% parse_number(., na = c("-", "NA"))
+    
+    # grabbing the historical "Average" temperatures (mean, min, and max)
+  average_vals <- html %>% 
+      html_nodes("#historyTable tr:nth-child(4) td:nth-child(3) , #historyTable tr:nth-child(3) :nth-child(3), #historyTable tr:nth-child(2) td:nth-child(3)") %>% html_text() %>% gsub("\n", "", .) %>% parse_number(., na = c("-", "NA"))
+    
+    # grabbing the labels for the temperature values
+    temp <- html %>% 
+      html_nodes("tr:nth-child(4) .indent , tr:nth-child(3) .indent, tr:nth-child(2) .indent") %>% 
+      html_text()
+  
+    return(data.frame(day = as.Date(substring(text = link, first = 1, last = 10)),
+                      mean_max_min = as.character(rep(temp, times = 2)),
+                      actual_ave = as.character(rep(c("Actual", "Historical Average"), each = 3)),
+                      value = as.numeric(c(actual_vals, average_vals))))
+}
+
+## WORKING ###
+df2 <- data.frame(Links = links[1:365])
+system.time(df2 %>% nest() %>% mutate(daily_temps = Links %>% purrr::map(grab_temps))) #%>% select(-Links) %>% unnest()
+##############
+
+```
+
+*Pasting togeter url and then using read_html*
+
+4/8/17  1:52pm   SYSTEM.TIME:   343.802 elapsed
+
+```{r}
+
+grab_temps2 <- function(date){
+    url <- paste0("https://www.wunderground.com/history/airport/", "KDSM/", date, "/DailyHistory.html") # Pasting together parts of url
+    html <- read_html(url)
+  
+  actual_vals <- html %>% 
+      html_nodes("#historyTable tr:nth-child(4) td:nth-child(2) , #historyTable tr:nth-child(3) td:nth-child(2), #historyTable tr:nth-child(2) td:nth-child(2)") %>% html_text() %>% gsub("\n", "", .) %>% parse_number(., na = c("-", "NA"))
+    
+    # grabbing the historical "Average" temperatures (mean, min, and max)
+  average_vals <- html %>% 
+      html_nodes("#historyTable tr:nth-child(4) td:nth-child(3) , #historyTable tr:nth-child(3) :nth-child(3), #historyTable tr:nth-child(2) td:nth-child(3)") %>% html_text() %>% gsub("\n", "", .) %>% parse_number(., na = c("-", "NA"))
+    
+    # grabbing the labels for the temperature values
+    temp <- html %>% 
+      html_nodes("tr:nth-child(4) .indent , tr:nth-child(3) .indent, tr:nth-child(2) .indent") %>% 
+      html_text()
+  
+    return(data.frame(day = as.Date(substring(text = link, first = 1, last = 10)),
+                      mean_max_min = as.character(rep(temp, times = 2)),
+                      actual_ave = as.character(rep(c("Actual", "Historical Average"), each = 3)),
+                      value = as.numeric(c(actual_vals, average_vals))))
+}
+
+link_dates <- gsub(pattern = "-", replacement = "/", x = seq(from = as.Date("1945-01-01"), to = Sys.Date(), by = "days"))
+airport <- "KDSM/"
+
+## WORKING ###
+df3 <- data.frame(Dates = link_dates[1:365])
+system.time(df3 %>% nest() %>% mutate(daily_temps = Dates %>% purrr::map(grab_temps2))) #%>% select(-Links) %>% unnest()
+##############
+
+```
+
