@@ -1,0 +1,46 @@
+---
+title: "static visual"
+author: "Kiegan Rice"
+date: "April 9, 2017"
+output: html_document
+---
+
+*install stuff*
+```{r}
+# installing ish
+library(tidyverse)
+library(beepr)
+```
+
+*read data*
+```{r}
+temps <- read.csv(file = "./raw-data/DSM_temps.csv")
+head(temps)
+```
+
+*get dates in right format*
+```{r}
+dates_2016 <- gsub(pattern = "-", replacement = "/", x = seq(from = as.Date("2016-01-01"), 
+                                                                  to = as.Date("2016-12-31"), by = "days"))
+
+temps <- temps %>% mutate(date_2016 = lubridate::ymd(paste("2016", month, day, sep = "-")))
+```
+
+*base of plot*
+```{r}
+base <- temps %>% ggplot(aes(x = date_2016))
+base
+```
+
+*record layer*
+```{r}
+data_record <- temps %>% filter(actual_ave_rec == "Record") %>% group_by(date_2016) %>%
+  spread(key = mean_max_min, value = value) 
+  
+layer_record <- geom_point(data = data_record, aes(x = date_2016+1, y = data_record$`Min Temperature`))
+layer_record <- geom_rect(data = data_record, aes(xmin = date_2016-.5, xmax = date_2016+.5, ymin = data_record$`Min Temperature`, ymax = data_record$`Max Temperature`, fill = "black"))
+
+base + layer_record
+```
+
+
