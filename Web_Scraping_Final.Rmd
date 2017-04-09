@@ -1,0 +1,86 @@
+---
+title: 'Web Scraping: attempt 2'
+author: "Katie Will"
+date: "April 8, 2017"
+output: html_document
+---
+
+*daily temperatures (approximately 26,000 days for DSM)*
+
+```{r}
+
+dates_all <- gsub(pattern = "-", replacement = "/", x = seq(from = as.Date("1945-01-01"), 
+                                                                 to = as.Date("2017-03-31"), by = "days"))
+links_all <- paste0(dates_all, "/DailyHistory.html")
+
+
+grab_act_temps <- function(link, airport){
+  s <- html_session("https://www.wunderground.com/history/airport/")
+  ss <- s %>% jump_to(paste0(airport, "/", link))
+  html <- read_html(ss)
+  
+   actual_vals <- html %>% 
+      html_nodes("#historyTable tr:nth-child(4) td:nth-child(2) , #historyTable tr:nth-child(3) td:nth-child(2), #historyTable tr:nth-child(2) td:nth-child(2)") %>% html_text() %>% gsub("\n", "", .) %>% parse_number(., na = c("-", "NA"))
+    
+    # grabbing the labels for the temperature values
+    temp <- html %>% 
+      html_nodes("tr:nth-child(4) .indent , tr:nth-child(3) .indent, tr:nth-child(2) .indent") %>% 
+      html_text()
+    
+    return(data.frame(day = as.Date(substring(text = link, first = 1, last = 10)),
+                      mean_max_min = as.character(temp),
+                      actual_ave_rec = as.character(rep("Actual", times = 3)),
+                      value = as.numeric(actual_vals)))
+}
+
+airport <- "KDSM"
+DSM_daily <- data.frame(Links = links_all)  
+DSM_daily <- DSM_daily %>% nest() %>% mutate(daily_temps = Links %>% purrr::map2(., airport, grab_act_temps)) %>%
+                  select(-Links) %>% unnest(data) %>% unnest(daily_temps) %>% as.data.frame()
+
+```
+
+
+*average and record temperatures (366 days)*
+```{r}
+
+dates_2016 <- gsub(pattern = "-", replacement = "/", x = seq(from = as.Date("2016-01-01"), 
+                                                                  to = as.Date("2016-12-31"), by = "days"))
+links_2016 <- paste0(dates_2016, "/DailyHistory.html")
+
+
+grab_ave_rec_temps <- function(link, airport){
+  s <- html_session("https://www.wunderground.com/history/airport/")
+  ss <- s %>% jump_to(paste0("KDSM/", link))
+  html <- read_html(ss)
+  
+    # grabbing the historical "Average" temperatures (mean, min, and max)
+    average_vals <- html %>% 
+      html_nodes("#historyTable tr:nth-child(4) td:nth-child(3) , #historyTable tr:nth-child(3) :nth-child(3), #historyTable tr:nth-child(2) td:nth-child(3)") %>% html_text() %>% gsub("\n", "", .) %>% parse_number(., na = c("-", "NA"))
+    
+    # grabbing the labels for the temperature values
+    temp <- html %>% 
+      html_nodes("tr:nth-child(4) .indent , tr:nth-child(3) .indent, tr:nth-child(2) .indent") %>% 
+      html_text()
+  
+    record <- html %>% 
+      html_nodes("#historyTable tr:nth-child(4) td:nth-child(4) , #historyTable tr:nth-child(3) td:nth-child(4)") %>%
+      html_text()
+    record_vals <- c("NA", parse_number(record))
+    record_yrs <- record %>% gsub("^[^\\(]+", "", .) %>% parse_number()
+    
+    return(data.frame(day = as.Date(c(rep(substring(text = link, first = 1, last = 10), times = 3), "NA",
+                              paste0(record_yrs, substring(text = link, first = 5, last = 10)))),
+                      mean_max_min = as.character(rep(temp, times = 2)),
+                      ave_rec = as.character(rep(c("Historical Average", "Record"), each = 3)),
+                      value = as.numeric(c(average_vals, record_vals))))
+}
+
+airport <- "KDSM"
+DSM_ave_rec <- data.frame(Links = links_2016)  
+DSM_ave_rec <- DSM_ave_rec %>% nest() %>% 
+  mutate(ave_rec_temps = Links %>% purrr::map2(., airport, grab_ave_rec_temps)) %>% 
+  select(-Links) %>% unnest(data) %>% unnest(ave_rec_temps) %>% as.data.frame()
+
+```
+
