@@ -113,6 +113,6 @@ DSM_temps <- DSM_temps %>% mutate(day = lubridate::day(date),
 
 *save final dataset*
 ```{r}
-save(DSM_temps, file = "raw-data/DSM_temps.csv")
+write.csv(DSM_temps, file = "raw-data/DSM_temps.csv")
 ```
 
