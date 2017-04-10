@@ -203,6 +203,17 @@ records_actual_plot
 averages_actual_plot
 all_plot
 beep(8)
+
+
+if(input$checkLayer == 1){
+    gg <- records_plot
+      }
+      else if(input$checkLayer == 2){
+        averages_plot
+      }
+      else if(input$checkLayer == 3){
+        actual_plot
+      }
 ```
 
 
