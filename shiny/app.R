@@ -12,9 +12,9 @@ shinyApp(
                                     min = 1945, max = 2016, step = 1, sep = "",value = 2015),
                         
                         checkboxGroupInput("checkLayer", label = ("Data Layers:"), 
-                                           choices = list("Record Values" = "RV", 
-                                                          "Historical Averages" = "HA", 
-                                                          "Daily for Current Year" = "DC"))),
+                                           choices = list("Record Values" = 1, 
+                                                          "Historical Averages" = 2, 
+                                                          "Daily for Current Year" = 3))),
              plotOutput('tempsplot'),
              verbatimTextOutput('selected'))),
   
@@ -195,23 +195,23 @@ shinyApp(
       else if(length(input$checkLayer) == 3){
         display_plot <- all_plot
       }
-      else if(input$checkLayer[1] == "RV" & input$checkLayer[2] == "HA"){
-        display_plot <- records_averages_plot
-      }
-      else if(input$checkLayer[1] == "RV" & input$checkLayer[2] == "DC"){
-        display_plot <- records_actual_plot
-      }
-      else if(input$checkLayer[1] == "HA" & input$checkLayer[2] == "DC"){
-        display_plot <- averages_actual_plot
-      }
-      else if(input$checkLayer == "DC"){
+      else if(length(input$checkLayer) == 1 & input$checkLayer[1] == "3"){
         display_plot <- actual_plot
       }
-      else if(input$checkLayer == "HA"){
+      else if(length(input$checkLayer) == 1 & input$checkLayer[1] == "2"){
         display_plot <- averages_plot
       }
-      else if(input$checkLayer == "RV"){
+      else if(length(input$checkLayer) == 1 & input$checkLayer[1] == "1"){
         display_plot <- records_plot
+      }
+      else if(input$checkLayer[1] == "1" & input$checkLayer[2] == "2"){
+        display_plot <- records_averages_plot
+      }
+      else if(input$checkLayer[1] == "1" & input$checkLayer[2] == "3"){
+        display_plot <- records_actual_plot
+      }
+      else if(input$checkLayer[1] == "2" & input$checkLayer[2] == "3"){
+        display_plot <- averages_actual_plot
       }
       else{
         display_plot <- base
@@ -224,7 +224,7 @@ shinyApp(
       gg()
     })
     output$selected = renderText({
-      input$checkLayer
+      input$checkLayer[1] == "1"
     })
     })
     
