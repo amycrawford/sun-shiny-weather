@@ -1,22 +1,27 @@
 library(shiny)
 require(tidyverse)
 require(dplyr)
+library(plotly)
 
-temps <- read.csv("../raw-data/DSM_temps.csv")
+#load("~/Desktop/IowaState/Semester4/Stat585X/Project/sun-shiny-weather/data/temps.Rda")
+##### I'm not sure why this did this... it is in the data folder so we should just be able to look at it
 # Define UI for application that draws a histogram
 shinyApp(
   ui = navbarPage(
-    "NYT Weather Chart",
+    "NYT Weather Chart: \n Major Midwestern Cities",
     tabPanel("Single Year",
-             inputPanel(sliderInput("yearSlider", label = "Year:",
+             inputPanel(selectInput("citySelect", label = "City:",
+                                    choices = unique(temps$city), selected = "Des Moines, IA"),
+                        sliderInput("yearSlider", label = "Year:",
                                     min = 1945, max = 2016, step = 1, sep = "",value = 2015),
                         
                         checkboxGroupInput("checkLayer", label = ("Data Layers:"), 
                                            choices = list("Record Values" = 1, 
                                                           "Historical Averages" = 2, 
                                                           "Daily for Current Year" = 3))),
-             plotOutput('tempsplot'),
-             verbatimTextOutput('selected'))),
+             plotOutput('tempsplot')#,
+             #verbatimTextOutput('selected')
+             )),
   
   
   server = function(input, output, session){
@@ -28,7 +33,7 @@ shinyApp(
       ############# BASE AND GENERAL SET-UP #############
       dates_2016 <- gsub(pattern = "-", replacement = "/", x = seq(from = as.Date("2016-01-01"), 
                                                                    to = as.Date("2016-12-31"), by = "days"))
-      temps <- temps %>% select(-X) %>% mutate(date_2016 = lubridate::ymd(paste("2016", month, day, sep = "-")))
+      temps <- temps %>% select(-X) %>% filter(city == input$citySelect) %>% mutate(date_2016 = lubridate::ymd(paste("2016", month, day, sep = "-")))
       base <- temps %>% ggplot(aes(x = date_2016)) + 
         theme_classic() +
         theme(panel.grid.major.x = element_line(colour = c("black", rep("grey", times = 11)), linetype = c(0, rep(2, times = 11))),
@@ -128,7 +133,7 @@ shinyApp(
         filter(actual_ave_rec == "Actual", year == input$yearSlider) %>% 
         group_by(month, day) %>% spread(key = mean_max_min, value = value)
       
-      layer_actual <- geom_rect(data = data_actual, aes(xmin = date_2016-.5, xmax = date_2016+.5, 
+      layer_actual <- geom_rect(data = data_actual, aes(xmin = date_2016, xmax = date_2016+1, 
                                                         ymin = data_actual$`Min Temperature`, ymax = data_actual$`Max Temperature`), 
                                 fill = "maroon")
       layer_white_ylines <- geom_hline(yintercept = seq(-20, 100, by = 20), colour = "white", lwd = 0.1)
@@ -223,8 +228,8 @@ shinyApp(
     output$tempsplot = renderPlot({
       gg()
     })
-    output$selected = renderText({
-      input$checkLayer[1] == "1"
-    })
+    #output$selected = renderText({
+    #  input$checkLayer[1] == "1"
+    #})
     })
     
