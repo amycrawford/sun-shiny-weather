@@ -43,9 +43,9 @@ grab_act_temps <- function(link, airport){
                       value = as.numeric(actual_vals)))
 }
 
-airport <- "KDSM"
-DSM_daily <- data.frame(Links = links_all)  
-DSM_daily <- DSM_daily %>% nest() %>% 
+airport <- "KORD"
+ORD_daily <- data.frame(Links = links_all)  
+ORD_daily <- ORD_daily %>% nest() %>% 
   mutate(daily_temps = Links %>% purrr::map2(., airport, grab_act_temps)) %>%
                   select(-Links) %>% unnest(data) %>% unnest(daily_temps) %>% as.data.frame()
 beepr::beep(8)
@@ -62,7 +62,7 @@ links_2016 <- paste0(dates_2016, "/DailyHistory.html")
 
 grab_ave_rec_temps <- function(link, airport){
   s <- html_session("https://www.wunderground.com/history/airport/")
-  ss <- s %>% jump_to(paste0("KDSM/", link))
+  ss <- s %>% jump_to(paste0("KORD/", link))
   html <- read_html(ss)
   
     # grabbing the historical "Average" temperatures (mean, min, and max)
@@ -87,9 +87,9 @@ grab_ave_rec_temps <- function(link, airport){
                       value = as.numeric(c(average_vals, record_vals))))
 }
 
-airport <- "KDSM"
-DSM_ave_rec <- data.frame(Links = links_2016)  
-DSM_ave_rec <- DSM_ave_rec %>% nest() %>% 
+airport <- "KORD"
+ORD_ave_rec <- data.frame(Links = links_2016)  
+ORD_ave_rec <- ORD_ave_rec %>% nest() %>% 
   mutate(ave_rec_temps = Links %>% purrr::map2(., airport, grab_ave_rec_temps)) %>% 
   select(-Links) %>% unnest(data) %>% unnest(ave_rec_temps) %>% as.data.frame()
 
@@ -97,22 +97,22 @@ DSM_ave_rec <- DSM_ave_rec %>% nest() %>%
 
 *put two datasets together and add some elements*
 ```{r}
-head(DSM_daily)
+head(ORD_daily)
 #names(DSM_daily) <- c("date", "mean_max_min", "actual_ave_rec", "value") # just one fix, already fixed in other code
-head(DSM_ave_rec)
+head(ORD_ave_rec)
 #names(DSM_ave_rec) <- c("date", "mean_max_min", "actual_ave_rec", "value") # just one fix, already fixed in other code
-DSM_temps <- rbind(DSM_daily, DSM_ave_rec)
+ORD_temps <- rbind(ORD_daily, ORD_ave_rec)
 
-DSM_temps <- DSM_temps %>% mutate(airport = airport)
-DSM_temps <- DSM_temps %>% mutate(city = "Des Moines, IA") # change this each time
+ORD_temps <- ORD_temps %>% mutate(airport = airport)
+ORD_temps <- ORD_temps %>% mutate(city = "Chicago, IL") # change this each time
 
-DSM_temps <- DSM_temps %>% mutate(day = lubridate::day(date),
+ORD_temps <- ORD_temps %>% mutate(day = lubridate::day(date),
                                   month = lubridate::month(date),
                                   year = lubridate::year(date))
 ```
 
 *save final dataset*
 ```{r}
-write.csv(DSM_temps, file = "raw-data/DSM_temps.csv")
+write.csv(ORD_temps, file = "raw-data/ORD_temps.csv")
 ```
 
