@@ -11,8 +11,10 @@ FAR_temps <- read.csv("raw-data/FAR_temps.csv")
 MSN_temps <- read.csv("raw-data/MSN_temps.csv")
 MSP_temps <- read.csv("raw-data/MSP_temps.csv")
 ORD_temps <- read.csv("raw-data/ORD_temps.csv")
+FSD_temps <- read.csv("raw-data/FSD_temps.csv")
+STL_temps <- read.csv("raw-data/STL_temps.csv")
 
-temps <- rbind(DSM_temps, FAR_temps, MSN_temps, MSP_temps, ORD_temps)
+temps <- rbind(DSM_temps, FAR_temps, MSN_temps, MSP_temps, ORD_temps, FSD_temps, STL_temps)
 
 save(temps, file = "data/temps.Rda")
 ```
