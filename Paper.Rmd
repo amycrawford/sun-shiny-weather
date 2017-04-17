@@ -13,6 +13,18 @@ abstract: "In 1979 The New York Times published what would become a classic visu
 ---
 
 
+```{r, echo = FALSE}
+# Notes:
+# - Some years there are missing values, they are replacing missing values with 0degreesF; 
+#       we will address this in the future work section unless we have time to deal with it before we present
+# - Why don't we just start at 1950 since all cities are started by then. Easier then changing where we start for each different city
+#
+#
+#
+#
+#
+```
+
 
 \section{Introduction}  
 
@@ -29,3 +41,20 @@ abstract: "In 1979 The New York Times published what would become a classic visu
 \section{Discussion}  
 
 \section{Future Work}  
+  - Fix data inconsistencies 
+  - Add in magic turning world
+  - Optimizing code
+  - Adding in ability to switch to celsius (?)
+  - Adding more cities 
+  - Add some sort of plotly interactivity/denote record years
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
