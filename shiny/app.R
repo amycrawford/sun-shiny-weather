@@ -21,7 +21,13 @@ shinyApp(
                                                           "Daily for Current Year" = 3))),
              plotOutput('tempsplot')#,
              #verbatimTextOutput('selected')
-             )),
+             ),
+    
+    tabPanel("Spaghetti Plot",
+             inputPanel(selectInput("citySelectSpag", label = "City:",
+                                    choices = unique(temps$city), selected = "Des Moines, IA")),
+             plotOutput('spagplot'))
+    ),
   
   
   server = function(input, output, session){
@@ -44,7 +50,7 @@ shinyApp(
         scale_x_date(date_breaks = "1 month", 
                      date_labels = "%b", 
                      expand=c(0,0)) + 
-        scale_y_continuous(breaks = seq(-20, 120, by = 20), limits= c(-40, 120)) + 
+        scale_y_continuous(breaks = seq(-50, 120, by = 20), limits= c(-50, 120)) + 
         xlab("") +
         ylab("")
       
@@ -136,7 +142,7 @@ shinyApp(
       layer_actual <- geom_rect(data = data_actual, aes(xmin = date_2016, xmax = date_2016+1, 
                                                         ymin = data_actual$`Min Temperature`, ymax = data_actual$`Max Temperature`), 
                                 fill = "maroon")
-      layer_white_ylines <- geom_hline(yintercept = seq(-20, 100, by = 20), colour = "white", lwd = 0.1)
+      layer_white_ylines <- geom_hline(yintercept = seq(-40, 100, by = 20), colour = "white", lwd = 0.1)
       
       
       
@@ -228,8 +234,74 @@ shinyApp(
     output$tempsplot = renderPlot({
       gg()
     })
-    #output$selected = renderText({
-    #  input$checkLayer[1] == "1"
-    #})
+
+    
+#################### SPAG PLOT THINGS BELOW HERE ##############################  
+    
+    ####### REACTIVE FOR SINGLE YEAR TABLE #######
+    gg_spag <- reactive({ 
+      temps_spag <- temps %>% 
+        select(-X) %>% filter(city == input$citySelectSpag, 
+                              actual_ave_rec == "Actual", 
+                              mean_max_min == "Mean Temperature") %>% 
+        mutate(date_2016 = lubridate::ymd(paste("2016", month, day, sep = "-")))
+      
+      base_spag <- temps_spag %>% filter(year < 2016) %>%
+        ggplot(aes(x = date_2016, y = value, group = year)) + 
+        geom_line(colour = "grey") + 
+        theme_classic() +
+        theme(panel.grid.major.x = element_line(colour = c("black", rep("grey", times = 11)), linetype = c(0, rep(2, times = 11))),
+              axis.text.x = element_text(hjust = -0.9), 
+              axis.line.x = element_blank(),
+              axis.ticks.x = element_blank(),
+              axis.line.y = element_line(colour = "darkgrey")) +
+        scale_x_date(date_breaks = "1 month", 
+                     date_labels = "%b", 
+                     expand=c(0,0)) + 
+        scale_y_continuous(breaks = seq(-50, 120, by = 20), limits= c(-50, 120)) + 
+        xlab("") +
+        ylab("")
+      
+      layer_2016 <- geom_line(data = temps_spag[temps_spag$year == 2016,], aes(x = date_2016, y = value), colour = "maroon")
+   
+      layer_2017 <- geom_line(data = temps_spag[temps_spag$year == 2017,], aes(x = date_2016, y = value), colour = "steelblue", lwd = 1.5)
+      
+      legend_layer_grey <- geom_rect(aes(xmin = lubridate::ymd("2016-07-13"), 
+                                           xmax =  lubridate::ymd("2016-07-27"), 
+                                           ymin = -5, 
+                                           ymax = -4.5), 
+                                       fill = "grey")
+      
+      legend_layer_maroon <- geom_rect(aes(xmin = lubridate::ymd("2016-07-13"), 
+                                         xmax =  lubridate::ymd("2016-07-27"), 
+                                         ymin = -9, 
+                                         ymax = -8.5), 
+                                     fill = "maroon")
+      
+      legend_layer_blue <- geom_rect(aes(xmin = lubridate::ymd("2016-07-13"), 
+                                         xmax =  lubridate::ymd("2016-07-27"), 
+                                         ymin = -13, 
+                                         ymax = -11.5), 
+                                     fill = "steelblue")
+      
+      text_layer_grey <-  annotate("text",
+                                     label = c("Mean Daily Temperatures", "1950 - 2015", "2016", "2017"), 
+                                     x =  c(lubridate::ymd("2016-07-13"), lubridate::ymd("2016-07-28"), lubridate::ymd("2016-07-28"), lubridate::ymd("2016-07-28")), 
+                                     y = c(0 , -4.75, -8.75, -12.5), 
+                                     hjust = "left", 
+                                     size = c(3.5, 2.3, 2.3, 2.3))
+      
+      spag_plot <- base_spag + layer_2016 + layer_2017 + legend_layer_grey+ legend_layer_maroon + legend_layer_blue + text_layer_grey
+      
+      return(spag_plot)  
+      
+    })
+    
+    
+    ####### SPAG PLOT ########
+    output$spagplot = renderPlot({
+      gg_spag()
+    })    
+    
     })
     

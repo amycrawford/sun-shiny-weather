@@ -1,0 +1,247 @@
+---
+title: "A (sun)Shiny Recreation of the New York Times \n Weather Chart"
+author: "Amy Crawford, Kiegan Rice, and Katie Will"
+header-includes:
+   - \usepackage{float}
+geometry: margin=2cm
+fontsize: 11pt
+output: 
+  pdf_document:
+    number_sections: true
+    fig_caption: yes
+abstract: "In 1979 The New York Times published what would become a classic visualization of weather data that maps how temperatures compare to historic averages and records over the course of one year. This visualization has changed in several ways over the years, and in 2016 The New York Times published an online, interactive version of this chart, displaying 2015 temperature data for 3,116 world cities. In this project, we scrape historical data from [Weather Underground](https://www.wunderground.com/) for multiple cities for the years 1945 to 2017. With this data, we recreate the interactive chart published by The New York Times and allow for user interaction via a shiny app. Although we do not include all 3,116 cities, our app includes extra features that allow for users to view the data over the course of many years and choose the features they would like to include on their version of this iconic chart."
+---
+
+
+```{r, echo = FALSE}
+# Notes:
+# - Some years there are missing values, they are replacing missing values with 0degreesF; 
+#       we will address this in the future work section unless we have time to deal with it before we present
+# - Why don't we just start at 1950 since all cities are started by then. Easier then changing where we start for each different city
+#
+#
+#
+#
+#
+```
+
+
+\section{Introduction}  
+
+\section{Methods}  
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# installing ish
+library(tidyverse)
+library(gridExtra)
+temps <- read.csv(file = "./raw-data/DSM_temps.csv")
+#head(temps)
+dates_2016 <- gsub(pattern = "-", replacement = "/", x = seq(from = as.Date("2016-01-01"), 
+                                                                  to = as.Date("2016-12-31"), by = "days"))
+temps <- temps %>% select(-X) %>% mutate(date_2016 = lubridate::ymd(paste("2016", month, day, sep = "-")))
+```
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+
+### BASE ###
+base <- temps %>% ggplot(aes(x = date_2016)) + 
+  theme_classic() +
+  theme(panel.grid.major.x = element_line(colour = c("black", rep("grey", times = 11)), linetype = c(0, rep(2, times = 11))),
+        axis.text.x = element_text(hjust = -0.9), 
+        axis.line.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.line.y = element_line(colour = "darkgrey")) +
+  scale_x_date(date_breaks = "1 month", 
+               date_labels = "%b", 
+               expand=c(0,0)) + 
+  scale_y_continuous(breaks = seq(-20, 120, by = 20), limits= c(-40, 120)) + 
+  xlab("") +
+  ylab("")
+
+text_layer_description <- annotate("text", 
+                                   label = "Bars represent the range between the daily high and low.",
+                                   x = lubridate::ymd("2016-07-24"),
+                                   y = -28, hjust = "center", size = 2.3)
+
+base <- base + text_layer_description
+
+### RECORD ###
+data_record <- temps %>% select(-date, -year) %>% 
+  filter(actual_ave_rec == "Record", mean_max_min != "Mean Temperature") %>% 
+  group_by(month, day) %>% spread(key = mean_max_min, value = value)
+  
+layer_record <- geom_rect(data = data_record, aes(xmin = date_2016, xmax = date_2016+1, ymin = data_record$`Min Temperature`, ymax = data_record$`Max Temperature`), fill = "#E6E5DD", alpha = 0.8)
+
+legend_layer_record <- geom_rect(aes(xmin = lubridate::ymd("2016-07-22"), 
+                                     xmax =  lubridate::ymd("2016-07-27"), 
+                                     ymin = -15, 
+                                     ymax = 15), 
+                                 fill = "#E6E5DD", alpha = 0.8)
+text_layer_record <-  annotate("text",
+                               label = c("Record Low", "Record High"), 
+                               x =  c(lubridate::ymd("2016-07-22"), lubridate::ymd("2016-07-22")), 
+                               y = c(-15, 15), 
+                               hjust = "right", 
+                               size = 2.3)
+
+records_plot <- base + 
+  layer_record + legend_layer_record + text_layer_record
+
+
+
+### AVERAGES ###
+data_average <- temps %>% select(-date, -year) %>% 
+  filter(actual_ave_rec == "Historical Average", mean_max_min != "Mean Temperature") %>% 
+  group_by(month, day) %>% spread(key = mean_max_min, value = value)
+  
+layer_average <- geom_rect(data = data_average, aes(xmin = date_2016, xmax = date_2016+1, 
+                                                   ymin = data_average$`Min Temperature`, ymax = data_average$`Max Temperature`), 
+                           fill = "#BCACAC", alpha = 0.8)
+
+legend_layer_average <- geom_rect(aes(xmin = lubridate::ymd("2016-07-24")-0.5, 
+                                     xmax =  lubridate::ymd("2016-07-25")+0.5, 
+                                     ymin = -10, 
+                                     ymax = 10), 
+                                 fill = "#BCACAC", alpha = 0.8)
+
+text_layer_average <-  annotate("text",
+                                label = "Normal range", 
+                                x =  lubridate::ymd("2016-07-19"), 
+                                y = 0, 
+                                hjust = "right", 
+                                size = 2.3)
+
+line_layer_average_ver <- geom_segment(aes(x = lubridate::ymd("2016-07-20"), 
+                                       xend = lubridate::ymd("2016-07-20"), 
+                                       y = -10, 
+                                       yend = 10), 
+                                   size = 0.01)
+
+line_layer_average_hor1 <- geom_segment(aes(x = lubridate::ymd("2016-07-20"),
+                   xend = lubridate::ymd("2016-07-22"),
+                   y = 10,
+                   yend = 10),
+               size = 0.01)
+
+line_layer_average_hor2 <- geom_segment(aes(x = lubridate::ymd("2016-07-20"),
+                   xend = lubridate::ymd("2016-07-22"),
+                   y = -10,
+                   yend = -10),
+               size = 0.01)
+
+records_averages_plot <- records_plot + layer_average + 
+  legend_layer_average + text_layer_average + 
+  line_layer_average_ver + line_layer_average_hor1 + line_layer_average_hor2
+  
+### ACTUAL ###
+data_actual <- temps %>% 
+  filter(actual_ave_rec == "Actual", year == 2015) %>% 
+  group_by(month, day) %>% spread(key = mean_max_min, value = value)
+  
+layer_actual <- geom_rect(data = data_actual, aes(xmin = date_2016-.5, xmax = date_2016+.5, 
+                                                   ymin = data_actual$`Min Temperature`, ymax = data_actual$`Max Temperature`), 
+                           fill = "maroon")
+layer_white_ylines <- geom_hline(yintercept = seq(-20, 100, by = 20), colour = "white", lwd = 0.1)
+
+
+
+legend_layer_actual <- geom_rect(aes(xmin = lubridate::ymd("2016-07-24")-0.05, 
+                                     xmax =  lubridate::ymd("2016-07-25")+0.15, 
+                                     ymin = -5, 
+                                     ymax = 12), 
+                                 fill = "maroon")
+
+
+text_layer_actual <-  annotate("text",
+                               label = c("Actual Low", "Actual High"), 
+                               x =  c(lubridate::ymd("2016-07-29"), lubridate::ymd("2016-07-29")), 
+                               y = c(-5, 12), 
+                               hjust = "left", 
+                               size = 2.3)
+
+line_layer_actual_hor1 <- geom_segment(aes(x = lubridate::ymd("2016-07-24"),
+                   xend = lubridate::ymd("2016-07-28"),
+                   y = -5,
+                   yend = -5),
+               size = 0.01)
+
+line_layer_actual_hor2 <- geom_segment(aes(x = lubridate::ymd("2016-07-24"),
+                   xend = lubridate::ymd("2016-07-28"),
+                   y = 12,
+                   yend = 12),
+               size = 0.01)
+
+
+#actual_plot <- base + layer_actual + legend_layer_actual + text_layer_actual + line_layer_actual_hor1 + line_layer_actual_hor2
+
+all_plot <- records_plot + 
+  layer_average + 
+  legend_layer_average + text_layer_average + 
+  line_layer_average_ver + line_layer_average_hor1 + line_layer_average_hor2 + 
+  layer_white_ylines +
+  layer_actual + legend_layer_actual + text_layer_actual + line_layer_actual_hor1 + line_layer_actual_hor2
+
+```
+
+
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 12, fig.height = 5, fig.cap = "The static visual at each of the individual steps, as layers were created and added to the chart."}
+
+base1 <- base + labs(title = "Step 1: Creating a base")
+records_plot1 <- records_plot + labs(title = "Step 2: Adding the record values")
+records_averages_plot1 <- records_averages_plot + labs(title = "Step 3: Adding historical averages")
+all_plot1 <- all_plot + labs(title = "Step 4: Adding daily temperature values for 2015")
+grid.arrange(base1, records_plot1, records_averages_plot1, all_plot1, ncol = 2)
+```
+
+\subsection{Scraping the Data}  
+
+\subsection{Creating a Static Visual}  
+
+The next magical step on our rainbow road to finishing 585X was to recreate the static New York Times weather chart. The original published chart 
+
+We began by focusing on the city of Des Moines and created our first static visual using the data scraped for this city.
+
+In expectation of needing flexiblilty of choosing layers in a shiny app, we created the static visual in layers that can be easily peiced together to produce a variety of charts for which the user can choose the detail of the layers to be plotted. The base of the plot included the axes, theme, and legend that would remain consistent regardless of which layers were placed on top. The theme and major gridlines were chosen to match the orignal chart as closely as possible (with not too much effort though). Each of the dates were plotted for the year 2016 for the base as it includes a leap year and all of our historic averages and records were scraped from the most recent completed year (2016). Thus, regardless of which year the user may choose to plot, leap day averages and records will appear even if a daily temperature is not available. The chart represents three levels of historic weather information and we chose to create each of those layers along with their respective legends in separate stages.  
+
+The first stage of the chart was created by graphing bars that spanned from the record low temperature to the record high temperature for each day over the course of one year. We then added a matching legend to the layer that would show up whenever the layer was present on the plot. The next layer was also constructed using bars, these spanned from the average low to the average high temperature for each calendar day, averaged accross all years. This layer also included its own portion of the legend that would plot whenever this layer was present. The final layer that was created included boxes that spanned from the daily high and low temperatures for each calendar day in 2015. This was the top layer and added the final piece of the legend to the plot. Along with this layer we also added faint white y-axis gridlines underneath as a reference point for viewers.   
+ 
+FIGURE 1
+
+\subsection{Introducing Shiny Interactivity}  
+\subsubsection{Classic Chart Recreation for a Single Year}
+
+Although we have a much smaller set of cities in our Shiny app, we wanted to include much of the same interactivity that the New York Times implemented, while also extending to add a few new ways that users could interact with the data. The main update we wanted to include was the ability to change which year the user wanted to have daily temperatures for. Although the original graphic allows for a lot of cool interpretability, the ability to compare across years is a huge advantage when investigating how weather trends have changed. Although we have daily temperature data ranging all the way back to 1945, the set of cities we are working with are inconsistent with their start dates. However, all cities in our data have daily temperatures beyond 1950, so we chose to make this element of the interactivity available for 1950 to 2016 only. Since the chart spans a full year, we do not include 2017 in the 'Single Year' tab of our Shiny app. Users can interact with data for the current year in the other tab, explained in section **something**.   
+
+As already discussed in the scraping section, we have a limited scope of cities. However, the interactivity with city is essentially the same as the New York Times chart, with the exception of the super cool moving globe thing. Users can choose a midwestern city from a drop-down menu that includes all available cities (that the app creators have scraped up to this point). 
+
+Users of the app can select which year they want to look at by moving a slider input across a variety of years. When users select a year, they are selecting which year they would like to see for the top layer. It is important to note that the record and historical averages layers will not change for any given city, no matter which year is selected. These are record values that are current through March 2017, either averaged with data from the current year (for average data), or updated when record data happens. 
+
+The most innovative update to the interactive version of this chart (or at least we think so) is that the user may choose which layers of the plot they would like to view together. A user can look at any of the three layers individually, or any combination of the three layers. This allows users to see the chart in all its glory, or just examine a single aspect of the data for that given city and year. The base layer and gridlines remain constant, and as users check boxes to select which layers they want to examine, the layers are added or removed from this base plot accordingly. No matter which order the boxes are checked in, layers will always be added in the order they are meant to be in the original chart (i.e., records on the bottom, then averages, and finally the daily temperatures on top). This interactivity was made possible by a reactive function that creates 7 plots of the possible layer combinations for the city-year pair, and returns the one that matches the boxes that the user has checked.
+
+
+
+\subsubsection{Historic Spaghetti Monster Plot for a Single City}
+
+
+\section{Results (maybe call this Outcomes?)}  
+
+\section{Discussion}  
+
+\section{Future Work}  
+  - Fix data inconsistencies 
+  - Add in magic turning world
+  - Optimizing code
+  - Adding in ability to switch to celsius (?)
+  - Adding more cities 
+  - Add some sort of plotly interactivity/denote record years
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
