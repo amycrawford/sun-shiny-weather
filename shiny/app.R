@@ -4,7 +4,7 @@ require(dplyr)
 library(plotly)
 library(rvest)
 
-load("temps.Rda")
+data(temps)
 ##### I'm not sure why this did this... it is in the data folder so we should just be able to look at it
 # Define UI for application that draws a histogram
 temps <- temps %>% na.omit()
