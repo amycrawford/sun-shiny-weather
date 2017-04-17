@@ -21,5 +21,6 @@ DET_temps <- read.csv("raw-data/DET_temps.csv")
 
 temps <- rbind(DSM_temps, FAR_temps, MSN_temps, MSP_temps, ORD_temps, FSD_temps, STL_temps, CMH_temps, OMA_temps, DET_temps)
 
-save(temps, file = "data/temps.Rda")
+save(temps, file = "data/temps.rda")
+save(temps, file = "shiny/temps.rda")
 ```
