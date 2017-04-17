@@ -32,7 +32,8 @@ shinyApp(
     
     tabPanel("Spaghetti Plot",
              inputPanel(selectInput("citySelectSpag", label = "City:",
-                                    choices = unique(temps$city), selected = "Des Moines, IA")),
+                                    choices = unique(temps$city), selected = "Des Moines, IA"),
+                        submitButton("Update View", icon("refresh"))),
              plotOutput('spagplot'))
     ),
   
