@@ -228,20 +228,17 @@ The most innovative update to the interactive version of this chart (or at least
 \section{Discussion}  
 
 \section{Future Work}  
-  - Fix data inconsistencies 
-  - Add in magic turning world
-  - Optimizing code
-  - Adding in ability to switch to celsius (?)
-  - Adding more cities 
-  - Add some sort of plotly interactivity/denote record years
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
+Although we believe this project has allowed us to successfully recreate an iconic weather chart and implement new interactive elements, there are still many improvements that could be made to this project. There are several elements of the New York Times interactive graphic that we did not include in ours; the cumulative precipitation chart for each month, the average temperature for the year and how it compares to historic averages, and the ability to switch the scale to Celsius instead of Fahrenheit.  
+
+Although it would require a lot of extra time to scrape precipitation data, we believe this would be a useful addition to the chart if time allowed. The Weather Underground does not include snow in their precipitation totals, so we would have to also take that into consideration when adding that new element to the chart, especially since our current cities are all in regions that have snowfall each winter.   
+
+In the top left corner of the original graphic, there is a note about what the year's average temperature was in that city, and how much higher or lower that overall average was than the historic average. As that was the focus of their chart on the interactive chart page, ``How Much Warmer Was Your City in 2015", it is difficult for statisticians to reconcile one overall average temperature for the entire year without any further explanation, especially for cities in which winter temperatures greatly vary from summer temperatures. We would like to explore other options to communicate this information, and perhaps find a more accurate or detailed way to display it to viewers.  
+
+Although it would simply require a change in the axes and a transformation of the data, we did not create the option for users to change between Celsius and Fahrenheit. With all the other options available to users, it would be a bit clunky to also add in that transformation.  
+
+The biggest roadblock for a lot of these issues is the code that we are working with. Scraping the data takes quite a while, because we have to open a link separately for each day we want data for in history. However, if we could find a quicker way to scrape this data, we would be very interested in expanding the scope of cities we have data for so that users have even more to work with. The framework we have set up for the Shiny interactivity also means that a lot of things have to happen to our data inside the app itself before we can display the image that the user would like to see; once we filter the data by city and year, the graphics themselves have to be created and then displayed based on which layers the user is interested in. If we could find a way to render much of this information outside of the 'reactive' statement or a better way to do it in general, we would be able to have more options and they would render more quickly.  
+
+Finally, we would like to be able to add some interactivity with the `plotly` package, or at least be able to denote record temperatures that happen in a given year when they occur. The original chart denotes when record values happen and labels them with what the value of that record temperature was. If we could allow users to be able to scroll over the values for the current year, they could see what the actual values were that make up the different layers. However, as it stands at the moment, when `plotly` is added to the graphic, it is extremely slow and takes approximately 1 minute to render a single plot. This is clearly an unreasonable amount of time for a user to wait for an image, especially if they want to switch around layers quickly.  
+
+Although we have not created an actual R package, we believe it would be a really fun interactive environment for users to look into, as well as for professors to use as teaching material - either about `ggplot2`, `shiny`, or just about interactive graphics in general. It may be advantageous to have this as a full R package available at least via GitHub, and let users know what they can do with the available data and the shiny app.  
