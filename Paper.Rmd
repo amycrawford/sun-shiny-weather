@@ -45,7 +45,19 @@ The first stage of the chart was created by graphing bars that spanned from the 
 FIGURE 1
 
 \subsection{Introducing Shiny Interactivity}  
+\subsubsection{Classic Chart Recreation for a Single Year}
 
+Although we have a much smaller set of cities in our Shiny app, we wanted to include much of the same interactivity that the New York Times implemented, while also extending to add a few new ways that users could interact with the data. The main update we wanted to include was the ability to change which year the user wanted to have daily temperatures for. Although the original graphic allows for a lot of cool interpretability, the ability to compare across years is a huge advantage when investigating how weather trends have changed. Although we have daily temperature data ranging all the way back to 1945, the set of cities we are working with are inconsistent with their start dates. However, all cities in our data have daily temperatures beyond 1950, so we chose to make this element of the interactivity available for 1950 to 2016 only. Since the chart spans a full year, we do not include 2017 in the 'Single Year' tab of our Shiny app. Users can interact with data for the current year in the other tab, explained in section **something**.   
+
+As already discussed in the scraping section, we have a limited scope of cities. However, the interactivity with city is essentially the same as the New York Times chart, with the exception of the super cool moving globe thing. Users can choose a midwestern city from a drop-down menu that includes all available cities (that the app creators have scraped up to this point). 
+
+Users of the app can select which year they want to look at by moving a slider input across a variety of years. When users select a year, they are selecting which year they would like to see for the top layer. It is important to note that the record and historical averages layers will not change for any given city, no matter which year is selected. These are record values that are current through March 2017, either averaged with data from the current year (for average data), or updated when record data happens. 
+
+The most innovative update to the interactive version of this chart (or at least we think so) is that the user may choose which layers of the plot they would like to view together. A user can look at any of the three layers individually, or any combination of the three layers. This allows users to see the chart in all its glory, or just examine a single aspect of the data for that given city and year. The base layer and gridlines remain constant, and as users check boxes to select which layers they want to examine, the layers are added or removed from this base plot accordingly. No matter which order the boxes are checked in, layers will always be added in the order they are meant to be in the original chart (i.e., records on the bottom, then averages, and finally the daily temperatures on top). This interactivity was made possible by a reactive function that creates 7 plots of the possible layer combinations for the city-year pair, and returns the one that matches the boxes that the user has checked.
+
+
+
+\subsubsection{Historic Spaghetti Monster Plot for a Single City}
 
 
 \section{Results (maybe call this Outcomes?)}  
