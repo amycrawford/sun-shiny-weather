@@ -2,6 +2,7 @@ library(shiny)
 require(tidyverse)
 require(dplyr)
 library(plotly)
+library(rvest)
 
 #load("~/Desktop/IowaState/Semester4/Stat585X/Project/sun-shiny-weather/data/temps.Rda")
 ##### I'm not sure why this did this... it is in the data folder so we should just be able to look at it
@@ -18,7 +19,9 @@ shinyApp(
                         checkboxGroupInput("checkLayer", label = ("Data Layers:"), 
                                            choices = list("Record Values" = 1, 
                                                           "Historical Averages" = 2, 
-                                                          "Daily for Current Year" = 3))),
+                                                          "Daily for Chosen Year" = 3), selected = c(1,2,3)),
+                        checkboxInput("currentTemp", label = "Add Current Temperature",
+                                           value = FALSE)),
              plotOutput('tempsplot')#,
              #verbatimTextOutput('selected')
              ),
@@ -227,6 +230,39 @@ shinyApp(
       else{
         display_plot <- base
       }
+      
+      
+      
+      ### add in if statement to scrape current temperature
+      if(length(input$checkLayer) > 0 & input$currentTemp == TRUE){
+        state <- gsub(".*\ ", "", input$citySelect)  ## getting state from the first entry in temps$city
+        city <- gsub(",.*", "", input$citySelect)  ## getting city from the first entry in temps$city
+        city <- gsub("\\.", "", city)  ## getting rid of "." if it exists in a city i.e. St. Louis
+        city <- gsub(" ", "_", city)  ## replacing a space with "_" i.e. St_Louis
+        
+        url <- paste0("https://www.wunderground.com/US/", state, "/", city, ".html")
+        html <- read_html(url)
+        
+        cur_temp <- html %>% html_nodes("#curTemp .wx-value") %>% html_text() %>% parse_number()
+        cur_date <- lubridate::ymd(paste0("2016", "-", lubridate::month(today()), "-", lubridate::day(today())))
+        
+        cur_point_layer <- geom_point(aes(x = cur_date, y = cur_temp), color = "black")
+        
+        cur_point_legend <-  annotate("text",
+                                      label = paste0("Current Temperature in ", input$citySelect), 
+                                      x =  cur_date, 
+                                      y = cur_temp + 25, 
+                                      hjust = "left", 
+                                      size = 3)
+        cur_point_legend_line <- geom_segment(aes(x = cur_date,
+                                                 xend = cur_date,
+                                                 y = cur_temp + 23,
+                                                 yend = cur_temp + 2),
+                                              size = 0.05, arrow = arrow(length = unit(0.3,"cm")))
+        display_plot <- display_plot + cur_point_layer + cur_point_legend + cur_point_legend_line
+      }
+      
+      
       return(display_plot)
     })
     
