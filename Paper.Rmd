@@ -34,7 +34,19 @@ abstract: "In 1979 The New York Times published what would become a classic visu
 
 \subsection{Creating a Static Visual}  
 
+The next magical step on our rainbow road to finishing 585X was to recreate the static New York Times weather chart. The original published chart 
+
+We began by focusing on the city of Des Moines and created our first static visual using the data scraped for this city.
+
+In expectation of needing flexiblilty of choosing layers in a shiny app, we created the static visual in layers that can be easily peiced together to produce a variety of charts for which the user can choose the detail of the layers to be plotted. The base of the plot included the axes, theme, and legend that would remain consistent regardless of which layers were placed on top. The theme and major gridlines were chosen to match the orignal chart as closely as possible (with not too much effort though). Each of the dates were plotted for the year 2016 for the base as it includes a leap year and all of our historic averages and records were scraped from the most recent completed year (2016). Thus, regardless of which year the user may choose to plot, leap day averages and records will appear even if a daily temperature is not available. The chart represents three levels of historic weather information and we chose to create each of those layers along with their respective legends in separate stages.  
+
+The first stage of the chart was created by graphing bars that spanned from the record low temperature to the record high temperature for each day over the course of one year. We then added a matching legend to the layer that would show up whenever the layer was present on the plot. The next layer was also constructed using bars, these spanned from the average low to the average high temperature for each calendar day, averaged accross all years. This layer also included its own portion of the legend that would plot whenever this layer was present. The final layer that was created included boxes that spanned from the daily high and low temperatures for each calendar day in 2015. This was the top layer and added the final piece of the legend to the plot. Along with this layer we also added faint white y-axis gridlines underneath as a reference point for viewers.   
+ 
+FIGURE 1
+
 \subsection{Introducing Shiny Interactivity}  
+
+
 
 \section{Results (maybe call this Outcomes?)}  
 
