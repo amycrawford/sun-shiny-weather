@@ -50,7 +50,7 @@ shinyApp(
         scale_x_date(date_breaks = "1 month", 
                      date_labels = "%b", 
                      expand=c(0,0)) + 
-        scale_y_continuous(breaks = seq(-20, 120, by = 20), limits= c(-40, 120)) + 
+        scale_y_continuous(breaks = seq(-50, 120, by = 20), limits= c(-50, 120)) + 
         xlab("") +
         ylab("")
       
@@ -142,7 +142,7 @@ shinyApp(
       layer_actual <- geom_rect(data = data_actual, aes(xmin = date_2016, xmax = date_2016+1, 
                                                         ymin = data_actual$`Min Temperature`, ymax = data_actual$`Max Temperature`), 
                                 fill = "maroon")
-      layer_white_ylines <- geom_hline(yintercept = seq(-20, 100, by = 20), colour = "white", lwd = 0.1)
+      layer_white_ylines <- geom_hline(yintercept = seq(-40, 100, by = 20), colour = "white", lwd = 0.1)
       
       
       
@@ -258,7 +258,7 @@ shinyApp(
         scale_x_date(date_breaks = "1 month", 
                      date_labels = "%b", 
                      expand=c(0,0)) + 
-        scale_y_continuous(breaks = seq(-20, 120, by = 20), limits= c(-40, 120)) + 
+        scale_y_continuous(breaks = seq(-50, 120, by = 20), limits= c(-50, 120)) + 
         xlab("") +
         ylab("")
       
