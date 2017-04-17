@@ -21,7 +21,8 @@ shinyApp(
                                                           "Historical Averages" = 2, 
                                                           "Daily for Chosen Year" = 3), selected = c(1,2,3)),
                         checkboxInput("currentTemp", label = "Add Current Temperature",
-                                           value = FALSE)),
+                                           value = FALSE),
+                        submitButton("Update View", icon("refresh"))),
              plotOutput('tempsplot')#,
              #verbatimTextOutput('selected')
              ),
