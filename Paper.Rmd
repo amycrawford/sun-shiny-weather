@@ -225,13 +225,17 @@ Again, users are able to choose a city to investigate from a drop down menu. For
 
 \section{Outcomes}  
 
-In the 'Single Year' tab of the Shiny app, users can interact with our recreation of the original chart. Although we have a much smaller set of cities in our Shiny app, we wanted to include much of the same interactivity that the New York Times implemented, while also extending to add a few new ways that users could interact with the data. The largest and most straight forward update that we wanted to include was the ability for users to choose which year to display daily temperatures for. The original graphic has many other impressive details, but the ability to view temperatures for a range of years will be a great advantage when investigating how weather trends change over time. Users of the app can select which year they want to look at by moving a slider input across a variety of years and the app reacts accordinly to change the top layer to reflect current temperatures for the chosen year.
+In the 'Single Year' tab of the Shiny app, users can interact with our recreation of the original chart (see Figure 2). Although we have a much smaller set of cities in our Shiny app we wanted to include much of the same interactivity that the New York Times implemented, and extend to add a few new ways that users could interact with the data.  
 
-What we might deem the most innovative update to the interactive version of this chart is the flexibility and variety of viewing options that are available to the user. We allow the user to look at any of the three layers individually, or any combination of the three layers. This allows them to see the full graphic that resembles the original New York Times chart, or just examine a single aspect of the data for a specified city and year. 
+The largest and most straight forward update that we wanted to include was the ability for users to choose which year to display daily temperatures for. The original graphic has many other impressive details, but the ability to view temperatures for a range of years will be a great advantage when investigating how weather trends change. Users of the app can select which year they want to look at by moving a slider input across a variety of years and the app reacts accordinly to change the top layer to reflect current temperatures for the chosen year.
+
+What we might deem the most innovative update to the interactive version of the original chart is the flexibility and variety of viewing options that are available to the user. Our app allows the user to look at any of the three layers individually, or any combination of the three layers. This allows them to see the full graphic that resembles the original New York Times chart (as in Figure 2), or just examine a single aspect of the data for a specified city and year. 
 
 ![Screenshot of Single Year Tab in Shiny App](Images/single_year_screenshot.png)
 
-In the 'Spaghetti Plot' tab the user can view average trends for a single city over multiple years in one graphic. This is advantagous to a user who is interested in assessing and comparing average weather trends between many years. Additionally this plot includes data for the year 2017, which the single year plot does not. In order to show the user what average temperatures have been doing lately, we highlight the latest complete year (2016) and the current incomplete year.
+In the 'Spaghetti Plot' tab the user can view average trends for a single city over multiple years in one plot. This is advantagous to a user who is interested in assessing and comparing average weather trends for a city over many years. Additionally this plot includes data for the year 2017, which the single year plot does not. In order to show the user what average temperatures have been doing lately, we highlight the latest complete year (2016) and the current incomplete year (2017).
+
+![Screenshot of Spaghetti Plot in Shiny App](Images/spag_plot_screenshot.png)
 
 
 
