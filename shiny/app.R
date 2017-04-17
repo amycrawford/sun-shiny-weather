@@ -249,7 +249,7 @@ shinyApp(
         html <- read_html(url)
         
         cur_temp <- html %>% html_nodes("#curTemp .wx-value") %>% html_text() %>% parse_number()
-        cur_date <- lubridate::ymd(paste0("2016", "-", lubridate::month(today()), "-", lubridate::day(today())))
+        cur_date <- lubridate::ymd(paste0("2016", "-", lubridate::month(lubridate::today()), "-", lubridate::day(lubridate::today())))
         
         cur_point_layer <- geom_point(aes(x = cur_date, y = cur_temp), color = "black")
         
