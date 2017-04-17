@@ -23,4 +23,5 @@ temps <- rbind(DSM_temps, FAR_temps, MSN_temps, MSP_temps, ORD_temps, FSD_temps,
 
 save(temps, file = "data/temps.rda")
 save(temps, file = "shiny/temps.rda")
+save(temps, file = "shiny/temps.csv")
 ```
