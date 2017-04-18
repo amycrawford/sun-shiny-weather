@@ -27,6 +27,9 @@ abstract: "In 1979 The New York Times published what would become a classic visu
 
 
 \section{Introduction}  
+In recent years, there has been an explosion in the use of interactive graphics and interactive data visualization, especially in the field of journalism. More and more media sources are making use of creative ways to present information to viewers that allows them to learn about the world around them. The ability to interact with these graphics allows for a powerful learning experience. The New York Times' "The Upshot" has been on the forefront of this vast field of exploration, as they not only have been presenting new and exciting static graphics for many decades in print, but have now expanded heavily into the world of user interaction. One of the quintissential examples of this user interaction is their ``How Much Warmer Was Your City in 2015" interactive graphic, based on the classic New York Times Weather Chart, published originally in 1979.  
+As the framework for creating interactive graphics in `R` has expanded as well, statisticians and data scientists now have the ability to create some of these same powerfully interactive graphics. In fact, Amanda Cox of The Upshot actually uses `R` to sketch out some of her graphics before implementing them using the `d3` library.  
+With the tools we have learned in Stat 585X at Iowa State, we can showcase these new abilities in `R` by scraping the weather data, recreating that quintissential chart, and creating a user-friendly interactive app using `shiny`.  
 
 \section{Methods}  
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
@@ -199,7 +202,7 @@ Our first step in recreating The New York Times interactive weather chart was sc
 
 We decided to scrape our data from Weather Underground because they supplied the necessary temperature data that we would need to recreate The New York Times chart in a refined table for multiple cities across the US. Along with that, the url was easy to update in a function according to year and city. Figure 1 is a screen shot for the webpage of Des Moines, IA for January 1, 2015. The url for this webpage is https://www.wunderground.com/history/airport/KDSM/2015/1/1/DailyHistory.html. In this url, "KDSM" indicates the Des Moines airport. Following that is the year, month, and date. These are the only segments of the url that change according to specified cities (i.e. airports) and days.  
 
-![Screen shot of Weather Underground site for Des Moines, IA on Janurary 1, 2015](weather_underground_screenshot.png)
+![Screen shot of Weather Underground site for Des Moines, IA on January 1, 2015](Images/weather_underground_screenshot.png)
 
 For each city, two functions were run to scrape the data. The first function scraped the daily actual mean, maximum, and minimum temperatures. On the Weather Underground webpage, this is the *Actual* column seen in Figure 1. The maximum and minimum daily actual temperatures would later become the lower and upper bounds of the daily temperature layer on our graphic. Daily temperatures were scraped for each day starting on January 1, 1950 and ending on March 31, 2017. The second function scraped the historical average mean, maximum, and minimum temperatures as well as the record maximum and minimum for each day. The record years were also recorded with the record maximum and minimum. On the Weather Underground webpage, this is the *Average* and *Record* columns seen in Figure 1. The reason behind using two functions to scrape the data was due to efficiency. The historical averages and daily records only needed to be scraped for one year (366 days) while the daily actual temperatures needed to be scraped for all years (over 24,000 days). 
 
@@ -226,6 +229,7 @@ When users select a single year, they are dictating the set of daily temperature
 
 Additionally, we decided to allow the user to select which layers of the visual they would like to view together. The base layer and gridlines will remain constant, and as users check boxes to select which layers they want to examine, the layers are added or removed from this base plot accordingly. No matter which order the boxes are checked in, layers will always be added in the order they are meant to be in the original chart (i.e., records on the bottom, then averages, and finally the daily temperatures on top). This interactivity was made possible by a reactive function that creates seven plots of each possible layer combination for the city-year pair, and returns the one that matches the boxes that the user has checked.  
 
+Finally, we added an option to add the current temperature at the corresponding airport. If the user should choose the option, our function scrapes the current temperature at that location in real-time and adds an annotated point for the current temperature.  
 
 
 \subsubsection{Spaghetti Plot for Many Years}
@@ -241,7 +245,7 @@ In the 'Single Year' tab of the Shiny app, users can interact with our recreatio
 
 The largest and most straight forward update that we wanted to include was the ability for users to choose which year to display daily temperatures for. The original graphic has many other impressive details, but the ability to view temperatures for a range of years will be a great advantage when investigating how weather trends change. Users of the app can select which year they want to look at by moving a slider input across a variety of years and the app reacts accordinly to change the top layer to reflect current temperatures for the chosen year.
 
-What we might deem the most innovative update to the interactive version of the original chart is the flexibility and variety of viewing options that are available to the user. Our app allows the user to look at any of the three layers individually, or any combination of the three layers. This allows them to see the full graphic that resembles the original New York Times chart (as in Figure 2), or just examine a single aspect of the data for a specified city and year. 
+What we might deem the most innovative update to the interactive version of the original chart is the flexibility and variety of viewing options that are available to the user. Our app allows the user to look at any of the three layers individually, or any combination of the three layers. This allows them to see the full graphic that resembles the original New York Times chart (as in Figure 2), or just examine a single aspect of the data for a specified city and year. We also give users the option to view the current temperature (scraped from the web in real time) at that location, in order to gain a reference for the current day and year.  
 
 ![Screenshot of Single Year Tab in Shiny App](Images/single_year_screenshot.png)
 
@@ -250,9 +254,6 @@ In the 'Spaghetti Plot' tab the user can view average trends for a single city o
 ![Screenshot of Spaghetti Plot in Shiny App](Images/spag_plot_screenshot.png)
 
 
-
-
-\section{Discussion}  
 
 \section{Future Work}  
 
