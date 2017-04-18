@@ -27,8 +27,11 @@ abstract: "In 1979 The New York Times published what would become a classic visu
 
 
 \section{Introduction}  
-In recent years, there has been an explosion in the use of interactive graphics and interactive data visualization, especially in the field of journalism. More and more media sources are making use of creative ways to present information to viewers that allows them to learn about the world around them. The ability to interact with these graphics allows for a powerful learning experience. The New York Times' "The Upshot" has been on the forefront of this vast field of exploration, as they not only have been presenting new and exciting static graphics for many decades in print, but have now expanded heavily into the world of user interaction. One of the quintissential examples of this user interaction is their ``How Much Warmer Was Your City in 2015" interactive graphic, based on the classic New York Times Weather Chart, published originally in 1979.  
-As the framework for creating interactive graphics in `R` has expanded as well, statisticians and data scientists now have the ability to create some of these same powerfully interactive graphics. In fact, Amanda Cox of The Upshot actually uses `R` to sketch out some of her graphics before implementing them using the `d3` library.  
+In recent years, there has been an explosion in the use of interactive graphics and interactive data visualization, especially in the field of journalism. More and more media sources are making use of creative ways to present information to viewers that allows them to learn about the world around them. The ability to interact with these graphics allows for a powerful learning experience. The New York Times' "The Upshot" has been on the forefront of this vast field of exploration, as they not only have been presenting new and exciting static graphics for many decades in print, but have now expanded heavily into the world of user interaction. One of the quintissential examples of this user interaction is their "How Much Warmer Was Your City in 2015" interactive graphic, based on the classic New York Times Weather Chart, published originally in 1979.    
+
+As the framework for creating interactive graphics in `R` has expanded as well, statisticians and data scientists now have the ability to create some of these same powerfully interactive graphics. In fact, Amanda Cox of The Upshot actually uses `R` to sketch out some of her graphics before implementing them using the `d3` library.    
+
+
 With the tools we have learned in Stat 585X at Iowa State, we can showcase these new abilities in `R` by scraping the weather data, recreating that quintissential chart, and creating a user-friendly interactive app using `shiny`.  
 
 \section{Methods}  
