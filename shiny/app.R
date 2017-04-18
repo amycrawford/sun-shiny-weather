@@ -17,7 +17,7 @@ shinyApp(
              inputPanel(selectInput("citySelect", label = "City:",
                                     choices = unique(temps$city), selected = "Des Moines, IA"),
                         sliderInput("yearSlider", label = "Year:",
-                                    min = 1945, max = 2016, step = 1, sep = "",value = 2015),
+                                    min = 1950, max = 2016, step = 1, sep = "",value = 2015),
                         
                         checkboxGroupInput("checkLayer", label = ("Data Layers:"), 
                                            choices = list("Record Values" = 1, 
@@ -287,7 +287,7 @@ shinyApp(
                               mean_max_min == "Mean Temperature") %>% 
         mutate(date_2016 = lubridate::ymd(paste("2016", month, day, sep = "-")))
       
-      base_spag <- temps_spag %>% filter(year < 2016) %>%
+      base_spag <- temps_spag %>% filter(year < 2016 & year > 1950) %>%
         ggplot(aes(x = date_2016, y = value, group = year)) + 
         geom_line(colour = "grey") + 
         theme_classic() +
