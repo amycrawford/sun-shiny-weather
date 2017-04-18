@@ -1,0 +1,27 @@
+---
+title: "raw-to-full"
+author: "Kiegan Rice"
+date: "April 11, 2017"
+output: html_document
+---
+
+```{r}
+DSM_temps <- read.csv("raw-data/DSM_temps.csv")
+FAR_temps <- read.csv("raw-data/FAR_temps.csv")
+MSN_temps <- read.csv("raw-data/MSN_temps.csv")
+MSP_temps <- read.csv("raw-data/MSP_temps.csv")
+ORD_temps <- read.csv("raw-data/ORD_temps.csv")
+FSD_temps <- read.csv("raw-data/FSD_temps.csv")
+STL_temps <- read.csv("raw-data/STL_temps.csv")
+CMH_temps <- read.csv("raw-data/CMH_temps.csv")
+OMA_temps <- read.csv("raw-data/OMA_temps.csv")
+DET_temps <- read.csv("raw-data/DET_temps.csv")
+
+
+
+temps <- rbind(DSM_temps, FAR_temps, MSN_temps, MSP_temps, ORD_temps, FSD_temps, STL_temps, CMH_temps, OMA_temps, DET_temps)
+
+save(temps, file = "data/temps.rda")
+save(temps, file = "shiny/data/temps.rda")
+#save(temps, file = "shiny/temps.csv")
+```

@@ -43,9 +43,9 @@ grab_act_temps <- function(link, airport){
                       value = as.numeric(actual_vals)))
 }
 
-airport <- "KORD"
-ORD_daily <- data.frame(Links = links_all)  
-ORD_daily <- ORD_daily %>% nest() %>% 
+airport <- "KDET"
+DET_daily <- data.frame(Links = links_all)  
+DET_daily <- DET_daily %>% nest() %>% 
   mutate(daily_temps = Links %>% purrr::map2(., airport, grab_act_temps)) %>%
                   select(-Links) %>% unnest(data) %>% unnest(daily_temps) %>% as.data.frame()
 beepr::beep(8)
@@ -87,9 +87,9 @@ grab_ave_rec_temps <- function(link, airport){
                       value = as.numeric(c(average_vals, record_vals))))
 }
 
-airport <- "KORD"
-ORD_ave_rec <- data.frame(Links = links_2016)  
-ORD_ave_rec <- ORD_ave_rec %>% nest() %>% 
+airport <- "KDET"
+DET_ave_rec <- data.frame(Links = links_2016)  
+DET_ave_rec <- DET_ave_rec %>% nest() %>% 
   mutate(ave_rec_temps = Links %>% purrr::map2(., airport, grab_ave_rec_temps)) %>% 
   select(-Links) %>% unnest(data) %>% unnest(ave_rec_temps) %>% as.data.frame()
 
@@ -97,22 +97,22 @@ ORD_ave_rec <- ORD_ave_rec %>% nest() %>%
 
 *put two datasets together and add some elements*
 ```{r}
-head(ORD_daily)
+head(DET_daily)
 #names(DSM_daily) <- c("date", "mean_max_min", "actual_ave_rec", "value") # just one fix, already fixed in other code
-head(ORD_ave_rec)
+head(DET_ave_rec)
 #names(DSM_ave_rec) <- c("date", "mean_max_min", "actual_ave_rec", "value") # just one fix, already fixed in other code
-ORD_temps <- rbind(ORD_daily, ORD_ave_rec)
+DET_temps <- rbind(DET_daily, DET_ave_rec)
 
-ORD_temps <- ORD_temps %>% mutate(airport = airport)
-ORD_temps <- ORD_temps %>% mutate(city = "Chicago, IL") # change this each time
+DET_temps <- DET_temps %>% mutate(airport = airport)
+DET_temps <- DET_temps %>% mutate(city = "Detroit, MI") # change this each time
 
-ORD_temps <- ORD_temps %>% mutate(day = lubridate::day(date),
+DET_temps <- DET_temps %>% mutate(day = lubridate::day(date),
                                   month = lubridate::month(date),
                                   year = lubridate::year(date))
 ```
 
 *save final dataset*
 ```{r}
-write.csv(ORD_temps, file = "raw-data/ORD_temps.csv")
+write.csv(DET_temps, file = "raw-data/DET_temps.csv")
 ```
 
