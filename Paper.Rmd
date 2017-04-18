@@ -244,9 +244,9 @@ The New York Times' interactive version of the chart allows users to select a ci
 
 With this original interactivity implemented, we next explored an interactive option that was not available on the New York Times web graphic. In the spirit of investigating historical weather trends, we decided users would find inclusion of data for multiple years valuable. Some of the cities that we scraped data for have daily temperature data ranging all the way back to 1945, but unfortunately the full set of cities we are working with do not agree on this start date. All of the cities do have daily temperatures beyond 1950, so we chose to make this element of the interactivity available to users only for the years 1950 to 2016 in the form of a slider bar. Since the chart spans a full year, we do not include 2017 in the 'Single Year' tab of our Shiny app. Users can view data for the current year in the other tab, explained in Section 2.3.2.  
   
-\vspace{.25cm}
+
   
-```{r, fig.height = 5, fig.width = 8, warning = F, message = F, echo = F}
+```{r, fig.height = 3, fig.width = 12, warning = F, message = F, echo = F, fig.cap = "Screenshot of Single Year Tab in Shiny App"}
 library(png)
 library(grid)
 img <- readPNG("Images/single_year_screenshot.png")
