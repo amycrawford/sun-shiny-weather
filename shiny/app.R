@@ -256,12 +256,12 @@ shinyApp(
         cur_point_legend <-  annotate("text",
                                       label = paste0("Current Temperature in ", input$citySelect), 
                                       x =  cur_date, 
-                                      y = cur_temp + 25, 
+                                      y = 110, 
                                       hjust = "left", 
                                       size = 3)
         cur_point_legend_line <- geom_segment(aes(x = cur_date,
                                                  xend = cur_date,
-                                                 y = cur_temp + 23,
+                                                 y = 110,
                                                  yend = cur_temp + 2),
                                               size = 0.05, arrow = arrow(length = unit(0.3,"cm")))
         display_plot <- display_plot + cur_point_layer + cur_point_legend + cur_point_legend_line
@@ -303,7 +303,7 @@ shinyApp(
         xlab("") +
         ylab("")
       
-      layer_2016 <- geom_line(data = temps_spag[temps_spag$year == 2016,], aes(x = date_2016, y = value), colour = "maroon")
+      layer_2016 <- geom_line(data = temps_spag[temps_spag$year == 2016,], aes(x = date_2016, y = value), colour = "steelblue")
    
       layer_2017 <- geom_line(data = temps_spag[temps_spag$year == 2017,], aes(x = date_2016, y = value), colour = "steelblue", lwd = 1.5)
       
@@ -317,7 +317,7 @@ shinyApp(
                                          xmax =  lubridate::ymd("2016-07-27"), 
                                          ymin = -9, 
                                          ymax = -8.5), 
-                                     fill = "maroon")
+                                     fill = "steelblue")
       
       legend_layer_blue <- geom_rect(aes(xmin = lubridate::ymd("2016-07-13"), 
                                          xmax =  lubridate::ymd("2016-07-27"), 
