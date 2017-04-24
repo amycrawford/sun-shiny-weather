@@ -108,7 +108,7 @@ shinyApp(
                                         fill = "#BCACAC", alpha = 0.8)
       
       text_layer_average <-  annotate("text",
-                                      label = "Normal range", 
+                                      label = "Range of Historical Averages", 
                                       x =  lubridate::ymd("2016-07-19"), 
                                       y = 0, 
                                       hjust = "right", 
