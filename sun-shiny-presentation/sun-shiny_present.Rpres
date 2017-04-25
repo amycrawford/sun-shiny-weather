@@ -23,11 +23,11 @@ Project Outline
 
 Scraping the Data
 ========================================================
-1. <font size="6">Loop for daily temperatures</font>
-2. <font size="6">Loop for historic records and averages</font>
+1. <font size="6">Loop for daily temperatures (~24,500 days)</font>
+2. <font size="6">Loop for historic records and averages (~365 days)</font>
 3. <font size="6">Current temperature</font>  
 
-<img src="figures/weather_underground_screenshot.png" height = "400px" width = "700px" />  
+<img src="figures/weather_underground_screenshot.png" height = "350px" width = "600px" />  
 <small><https://www.wunderground.com/history/airport/KDSM/2015/1/1/DailyHistory></small>
 
 
