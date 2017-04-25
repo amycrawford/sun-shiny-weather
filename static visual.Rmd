@@ -95,7 +95,7 @@ legend_layer_average <- geom_rect(aes(xmin = lubridate::ymd("2016-07-24")-0.5,
                                  fill = "#BCACAC", alpha = 0.8)
 
 text_layer_average <-  annotate("text",
-                                label = "Normal range", 
+                                label = "Range of historical averages", 
                                 x =  lubridate::ymd("2016-07-19"), 
                                 y = 0, 
                                 hjust = "right", 
