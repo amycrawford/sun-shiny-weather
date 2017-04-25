@@ -249,7 +249,7 @@ With this original interactivity implemented, we next explored an interactive op
 ```{r, fig.height = 3, fig.width = 12, warning = F, message = F, echo = F, fig.cap = "Screenshot of Single Year Tab in Shiny App"}
 library(png)
 library(grid)
-img <- readPNG("Images/single_year_screenshot.png")
+img <- readPNG("Images/single_year_screenshot2.png")
 grid.raster(img)
 ```
 
